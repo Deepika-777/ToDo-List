@@ -1,0 +1,87 @@
+<div class="root">
+    <div class="navbar has-background-dark">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <h1 class="app-name has-gradient-text">ToDo List App</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="board">
+
+        <div class="board-bar">
+            <p class="board-name">Cards List</p>
+        </div>
+        <div>
+            <span class="add"><button mat-raised-button (click)="addColumn()">Add Column +</button></span>
+            <span class="remove"><button mat-raised-button (click)="removeColumn()">Remove Column -</button></span>
+        </div>
+        <div class="board-wrapper">
+            <div class="board-columns">
+                <div cdkDropList [cdkDropListData]="board.columns" style="display:flex" (cdkDropListDropped)="drop2($event)" cdkDropListOrientation="horizontal">
+
+                    <div class="board-column" *ngFor="let column of board.columns;let x = index " cdkDrag>
+
+                        <div class="column-title">
+                            <h1> {{ column.name }} </h1>
+
+                            <div class="count">
+                                <h1> Count: {{ column.effort_sum }} </h1>
+                            </div>
+                        </div>
+
+                        <div class="tasks-container" cdkDropList [id]="convertToString(column)" [cdkDropListData]="column.tasks" [cdkDropListConnectedTo]="columnIds" (cdkDropListDropped)="drop($event)">
+                            <div class="task" *ngFor="let item of column.tasks let y = index " cdkDrag (click)="activeCard = item">
+                                <div>
+                                    <h2>
+                                        <div class="Add_work"> Add Work: {{item.title | slice:0:item.titlelimit }}
+                                            <span class="btn">
+                                            <input type="button" value="More" (click)="item.titlelimit = 100"></span>
+                                        </div>
+                                    </h2>
+
+                                    <h3>
+                                        <div>Efforts: {{item.effort}}</div>
+                                        <div>Due Date: {{item.due_date}}</div>
+                                        <div>Work Status: {{statusChecked(item.status)}}</div>
+                                    </h3>
+
+                                    <footer>
+                                        <div>Work Created: {{item.start_date | date }}</div>
+                                        <div>Work Completed: {{item.end_date | date }}</div>
+                                        <span style="float: right; margin-top: 5px;"> 
+                                            <input type = button  value="Edit" id="b1" (click)="editCard(item, x, y)"> </span>
+                                    </footer>
+                                </div>
+                            </div>
+
+                            <div>
+                                <span><button mat-raised-button (click)="showInsertTaskModel(column, x)"  >+</button></span>&nbsp;
+                                <span><button mat-raised-button (click)="removeCard(x)">-</button></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{showInsertTaskForm}}
+<div class="modal" *ngIf="showInsertTaskForm">
+    <div class="modal-content">
+        <ng-form name="todoForm">
+            <label>Title :</label>&nbsp;
+            <input type="text" id="title" name="title" [(ngModel)]="activeCard.title" ng-required="true"><br><br>
+            <label>Efforts :</label>&nbsp;
+            <input type="number" id="number" name="number" [(ngModel)]="activeCard.effort" ng-required="true"><br><br>
+            <label>Date :</label>&nbsp;
+            <input type="date" id="due_date" name="due_date" [(ngModel)]="activeCard.due_date" ng-required="true"><br><br>
+            <label>Checked :</label>&nbsp;
+            <input type="checkbox" disabled="{{activeCard.isEditCard ? false : true}}" id="checkbox" name="checkbox" value="false" [(ngModel)]="activeCard.status"><br><br>
+            <input type="button" value="Add Card" *ngIf="!activeCard.isEditCard" (click)="addCard()">&nbsp;
+            <input type="button" value="Save" *ngIf="activeCard.isEditCard" (click)="saveCard()">&nbsp;
+            <input type="button" value="Cancel" (click)="cancel()">
+        </ng-form>
+    </div>
+</div>
